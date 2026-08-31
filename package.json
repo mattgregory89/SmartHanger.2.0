@@ -1,0 +1,8 @@
+{
+  "name": "smarthangar-java",
+  "private": true,
+  "scripts": {
+    "install-client": "npm install --prefix client",
+    "client": "npm run dev --prefix client"
+  }
+}
