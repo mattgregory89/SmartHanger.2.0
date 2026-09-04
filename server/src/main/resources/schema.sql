@@ -103,3 +103,9 @@ CREATE TABLE IF NOT EXISTS modifications (
     notes TEXT,
     FOREIGN KEY (aircraft_id) REFERENCES aircraft(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS device_config (
+    id INTEGER PRIMARY KEY,
+    device_name TEXT NOT NULL,
+    aircraft_id INTEGER,
+    mode TEXT NOT NULL DEFAULT 'AIRCRAFT'
+);

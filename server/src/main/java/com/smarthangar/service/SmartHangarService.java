@@ -1,10 +1,5 @@
 package com.smarthangar.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Service;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDateTime;
@@ -14,14 +9,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class SmartHangarService {
 
     private final JdbcTemplate jdbc;
+    private final LedgerService ledgerService;
     private static final DateTimeFormatter SQL_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SmartHangarService(JdbcTemplate jdbc) {
+    public SmartHangarService(
+            JdbcTemplate jdbc,
+            LedgerService ledgerService) {
+
         this.jdbc = jdbc;
+        this.ledgerService = ledgerService;
     }
 
     private String nowSql() {
@@ -47,7 +55,8 @@ public class SmartHangarService {
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();
-        if (key == null) throw new IllegalStateException("Insert did not return an id");
+        if (key == null)
+            throw new IllegalStateException("Insert did not return an id");
         return key.longValue();
     }
 
@@ -55,8 +64,7 @@ public class SmartHangarService {
         Integer redXCount = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM discrepancies WHERE aircraft_id=? AND status='OPEN' AND symbol='RED X'",
                 Integer.class,
-                aircraftId
-        );
+                aircraftId);
 
         if (redXCount != null && redXCount > 0) {
             jdbc.update("UPDATE aircraft SET status='NMC', last_updated=? WHERE id=?", nowSql(), aircraftId);
@@ -70,7 +78,8 @@ public class SmartHangarService {
     }
 
     public Optional<Map<String, Object>> login(String username, String password) {
-        return one("SELECT id, username, full_name, role FROM users WHERE username=? AND password=?", username, password);
+        return one("SELECT id, username, full_name, role FROM users WHERE username=? AND password=?", username,
+                password);
     }
 
     public Map<String, Object> dashboard() {
@@ -83,14 +92,15 @@ public class SmartHangarService {
                 ORDER BY CASE d.symbol WHEN 'RED X' THEN 1 WHEN 'RED DASH' THEN 2 ELSE 3 END,
                          d.reported_date DESC
                 """);
-        List<Map<String, Object>> dueInspections = many("""
-                SELECT i.*, a.tail_number, a.total_hours,
-                       CASE WHEN i.due_hours IS NULL THEN NULL ELSE ROUND(i.due_hours - a.total_hours, 1) END AS hours_remaining
-                FROM inspections i
-                JOIN aircraft a ON a.id=i.aircraft_id
-                WHERE i.status != 'COMPLETE'
-                ORDER BY COALESCE(i.due_hours - a.total_hours, 999999), i.due_date
-                """);
+        List<Map<String, Object>> dueInspections = many(
+                """
+                        SELECT i.*, a.tail_number, a.total_hours,
+                               CASE WHEN i.due_hours IS NULL THEN NULL ELSE ROUND(i.due_hours - a.total_hours, 1) END AS hours_remaining
+                        FROM inspections i
+                        JOIN aircraft a ON a.id=i.aircraft_id
+                        WHERE i.status != 'COMPLETE'
+                        ORDER BY COALESCE(i.due_hours - a.total_hours, 999999), i.due_date
+                        """);
 
         Map<String, Integer> counts = new LinkedHashMap<>();
         counts.put("FMC", 0);
@@ -115,14 +125,16 @@ public class SmartHangarService {
 
     public Optional<Map<String, Object>> aircraftDetail(long id) {
         Optional<Map<String, Object>> aircraftOpt = one("SELECT * FROM aircraft WHERE id=?", id);
-        if (aircraftOpt.isEmpty()) return Optional.empty();
+        if (aircraftOpt.isEmpty())
+            return Optional.empty();
 
         Map<String, Object> aircraft = aircraftOpt.get();
         double totalHours = ((Number) aircraft.get("total_hours")).doubleValue();
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("aircraft", aircraft);
-        response.put("discrepancies", many("SELECT * FROM discrepancies WHERE aircraft_id=? ORDER BY reported_date DESC", id));
+        response.put("discrepancies",
+                many("SELECT * FROM discrepancies WHERE aircraft_id=? ORDER BY reported_date DESC", id));
         response.put("inspections", many("""
                 SELECT *, CASE WHEN due_hours IS NULL THEN NULL ELSE ROUND(due_hours - ?, 1) END AS hours_remaining
                 FROM inspections WHERE aircraft_id=? ORDER BY due_hours, due_date
@@ -132,33 +144,75 @@ public class SmartHangarService {
                 FROM time_change_items WHERE aircraft_id=? ORDER BY due_hours, due_date
                 """, totalHours, id));
         response.put("engines", many("SELECT * FROM engines WHERE aircraft_id=? ORDER BY position", id));
-        response.put("servicing", many("SELECT * FROM servicing_records WHERE aircraft_id=? ORDER BY service_date DESC", id));
+        response.put("servicing",
+                many("SELECT * FROM servicing_records WHERE aircraft_id=? ORDER BY service_date DESC", id));
         response.put("modifications", many("SELECT * FROM modifications WHERE aircraft_id=? ORDER BY id DESC", id));
         return Optional.of(response);
     }
 
     public Optional<Map<String, Object>> setAircraftStatus(long id, String status) {
         int changed = jdbc.update("UPDATE aircraft SET status=?, last_updated=? WHERE id=?", status, nowSql(), id);
-        if (changed == 0) return Optional.empty();
+        if (changed == 0)
+            return Optional.empty();
         return one("SELECT * FROM aircraft WHERE id=?", id);
     }
 
-    public Map<String, Object> addDiscrepancy(long aircraftId, String description, String symbol,
-                                               String assignedShop, String reportedBy) {
+    public Map<String, Object> addDiscrepancy(
+            long aircraftId,
+            String description,
+            String symbol,
+            String assignedShop,
+            String reportedBy) {
+
         Integer count = jdbc.queryForObject(
-                "SELECT COUNT(*) FROM discrepancies WHERE aircraft_id=?", Integer.class, aircraftId);
-        int next = aircraftId > 0 ? (int) (aircraftId * 100 + (count == null ? 0 : count) + 1) : 1;
+                "SELECT COUNT(*) FROM discrepancies WHERE aircraft_id=?",
+                Integer.class,
+                aircraftId);
+
+        int next = aircraftId > 0
+                ? (int) (aircraftId * 100 + (count == null ? 0 : count) + 1)
+                : 1;
+
         String number = "MX-%03d".formatted(next);
 
-        long id = insertAndReturnId("""
-                INSERT INTO discrepancies
-                (aircraft_id, discrepancy_number, description, symbol, status, reported_by, reported_date, assigned_shop)
-                VALUES (?, ?, ?, ?, 'OPEN', ?, ?, ?)
-                """, aircraftId, number, description, symbol,
-                blankToDefault(reportedBy, "Demo Maintainer"), nowSql(), blankToDefault(assignedShop, "CREW CHIEF"));
+        String maintainer = blankToDefault(
+                reportedBy,
+                "Demo Maintainer");
+
+        long id = insertAndReturnId(
+                """
+                        INSERT INTO discrepancies
+                        (aircraft_id, discrepancy_number, description, symbol, status, reported_by, reported_date, assigned_shop)
+                        VALUES (?, ?, ?, ?, 'OPEN', ?, ?, ?)
+                        """,
+                aircraftId,
+                number,
+                description,
+                symbol,
+                maintainer,
+                nowSql(),
+                blankToDefault(assignedShop, "CREW CHIEF"));
 
         refreshAircraftStatus(aircraftId);
-        return one("SELECT * FROM discrepancies WHERE id=?", id).orElseThrow();
+
+        Map<String, Object> savedDiscrepancy = one(
+                "SELECT * FROM discrepancies WHERE id=?",
+                id).orElseThrow();
+
+        try {
+            String jsonPayload = objectMapper.writeValueAsString(savedDiscrepancy);
+
+            ledgerService.recordMaintenanceEvent(
+                    jsonPayload,
+                    maintainer);
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to record discrepancy in maintenance ledger",
+                    e);
+        }
+
+        return savedDiscrepancy;
     }
 
     public Map<String, Object> addAction(long discrepancyId, String actionText, String performedBy) {
@@ -169,9 +223,11 @@ public class SmartHangarService {
         return one("SELECT * FROM maintenance_actions WHERE id=?", id).orElseThrow();
     }
 
-    public Optional<Map<String, Object>> closeDiscrepancy(long discrepancyId, String correctiveAction, String closedBy) {
+    public Optional<Map<String, Object>> closeDiscrepancy(long discrepancyId, String correctiveAction,
+            String closedBy) {
         Optional<Map<String, Object>> discrepancy = one("SELECT * FROM discrepancies WHERE id=?", discrepancyId);
-        if (discrepancy.isEmpty()) return Optional.empty();
+        if (discrepancy.isEmpty())
+            return Optional.empty();
 
         String closer = blankToDefault(closedBy, "Demo Maintainer");
         if (correctiveAction != null && !correctiveAction.isBlank()) {
@@ -193,7 +249,7 @@ public class SmartHangarService {
     }
 
     public Map<String, Object> addServicing(long aircraftId, String type, double quantity, String unit,
-                                             String servicedBy, String notes) {
+            String servicedBy, String notes) {
         long id = insertAndReturnId("""
                 INSERT INTO servicing_records (aircraft_id, type, quantity, unit, serviced_by, service_date, notes)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -231,12 +287,14 @@ public class SmartHangarService {
 
     public Optional<Map<String, Object>> turnover(long aircraftId) {
         Optional<Map<String, Object>> aircraft = one("SELECT * FROM aircraft WHERE id=?", aircraftId);
-        if (aircraft.isEmpty()) return Optional.empty();
+        if (aircraft.isEmpty())
+            return Optional.empty();
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("aircraft", aircraft.get());
         response.put("openDiscrepancies", many(
-                "SELECT * FROM discrepancies WHERE aircraft_id=? AND status='OPEN' ORDER BY reported_date", aircraftId));
+                "SELECT * FROM discrepancies WHERE aircraft_id=? AND status='OPEN' ORDER BY reported_date",
+                aircraftId));
         response.put("latestServicing", many("""
                 SELECT s1.* FROM servicing_records s1
                 WHERE s1.aircraft_id=? AND s1.service_date=(

@@ -1,26 +1,46 @@
 package com.smarthangar.controller;
 
-import com.smarthangar.service.SmartHangarService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.smarthangar.ledger.MaintenanceLedgerV3;
+import com.smarthangar.service.LedgerService;
+import com.smarthangar.service.SmartHangarService;
 
 @RestController
 @RequestMapping("/api")
 public class SmartHangarController {
 
     private final SmartHangarService service;
+    private final LedgerService ledgerService;
 
-    public SmartHangarController(SmartHangarService service) {
+    public SmartHangarController(
+            SmartHangarService service,
+            LedgerService ledgerService) {
+
         this.service = service;
+        this.ledgerService = ledgerService;
     }
 
     @GetMapping("/health")
     public Map<String, String> health() {
         return Map.of("status", "SmartHangar API running");
+    }
+
+    @GetMapping("/ledger")
+    public List<MaintenanceLedgerV3.Block> getLedger() {
+        return ledgerService.getLedger().getChain();
     }
 
     @PostMapping("/login")
