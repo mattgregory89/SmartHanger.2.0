@@ -45,3 +45,8 @@ INSERT OR IGNORE INTO servicing_records (id, aircraft_id, type, quantity, unit, 
 INSERT OR IGNORE INTO modifications (id, aircraft_id, mod_number, title, description, status, completed_date, notes) VALUES
 (1, 1, 'MOD-2026-014', 'Updated Communications Package', 'Demonstration communications-system modification.', 'IN PROGRESS', NULL, 'Kit received; awaiting scheduled downtime'),
 (2, 1, 'MOD-2025-008', 'Cabin Lighting Update', 'Demonstration lighting configuration update.', 'COMPLETE', '2025-12-11', 'Completed and inspected');
+
+INSERT OR IGNORE INTO device_config
+(id, device_name, aircraft_id, mode)
+VALUES
+(1, 'SMART-HANGAR-LOCAL-01', 1, 'AIRCRAFT');
