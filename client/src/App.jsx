@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import AircraftPage from './pages/AircraftPage.jsx';
 import SearchPage from './pages/SearchPage.jsx';
+import OfflineDemoPage from './pages/OfflineDemoPage.jsx';
+import AnalyticsPage from './pages/AnalyticsPage.jsx';
 import Header from './components/Header.jsx';
 
 export default function App() {
@@ -36,6 +38,8 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/aircraft/:id" element={<AircraftPage user={user} />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/offline-demo" element={<OfflineDemoPage user={user} />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

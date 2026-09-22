@@ -1,6 +1,7 @@
 // LoginPage.jsx
 import React, { useState } from 'react';
 import { api } from '../api.js';
+import SmartHangarLogo from '../components/SmartHangarLogo.jsx';
 
 export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState('maintainer');
@@ -20,7 +21,7 @@ export default function LoginPage({ onLogin }) {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={submit}>
-        <div className="logo-mark">SH</div>
+        <SmartHangarLogo />
         <h1>SmartHangar</h1>
         <p>Aircraft Maintenance Tracker</p>
         <label>Username<input value={username} onChange={e => setUsername(e.target.value)} /></label>

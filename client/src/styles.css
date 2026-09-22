@@ -27,3 +27,447 @@ button { cursor: pointer; }
 .status-buttons { display:flex; gap:10px; }.status-buttons button:nth-child(1){background:#287b55}.status-buttons button:nth-child(2){background:#a77117}.status-buttons button:nth-child(3){background:#a73636}.hint { color:#687386; line-height:1.5; font-size:14px; }.timeline { padding-left:6px; }.timeline-event { display:grid; grid-template-columns:22px 1fr; gap:12px; position:relative; padding-bottom:22px; }.timeline-event:before { content:""; position:absolute; width:2px; background:#dbe1e8; left:6px; top:12px; bottom:-4px; }.timeline-event:last-child:before { display:none; }.timeline-dot { width:14px; height:14px; border-radius:50%; background:#245d95; margin-top:4px; z-index:1; }.timeline-event div:last-child { display:flex; flex-direction:column; gap:3px; }.timeline-event small { color:#7a8494; }.timeline-event p { margin:2px 0; }.turnover-header { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; background:#f5f7f9; padding:15px; border-radius:8px; }.turnover-header div { display:flex; flex-direction:column; gap:5px; }.turnover h3 { margin-top:24px; }.turnover-job { border:1px solid #e1e6eb; border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:8px; margin-bottom:9px; }.turnover-job span { display:flex; gap:8px; align-items:center; }.turnover-job small { color:#737e8e; }.search-result { display:grid; grid-template-columns:220px 1fr auto; gap:15px; align-items:center; padding:13px 0; border-bottom:1px solid #edf0f3; }.empty-state { padding:24px; text-align:center; color:#7a8494; }
 @media (max-width: 1050px) { .topbar { grid-template-columns:1fr 1fr; }.search-form { grid-row:2; grid-column:1/-1; }.metric-grid { grid-template-columns:repeat(3,1fr); }.two-col { grid-template-columns:1fr; } }
 @media (max-width: 700px) { .page-shell { padding:16px; }.topbar { padding:12px 16px; grid-template-columns:1fr; }.user-area { justify-content:space-between; }.metric-grid,.overview-metrics { grid-template-columns:repeat(2,1fr); }.form-grid { grid-template-columns:1fr; }.form-grid .wide { grid-column:auto; }.aircraft-hero { align-items:flex-start; flex-direction:column; gap:20px; }.hero-status { align-items:flex-start; }.turnover-header { grid-template-columns:1fr; }.search-result { grid-template-columns:1fr; }.page-heading { align-items:flex-start; flex-direction:column; gap:8px; } }
+
+
+.offline-status { display:flex; align-items:center; gap:.45rem; padding:.4rem .65rem; border:1px solid var(--border, #d8dee8); border-radius:999px; font-size:.78rem; white-space:nowrap; }
+.offline-status.offline { font-weight:700; }
+.offline-status button { padding:.25rem .5rem; font-size:.72rem; }
+.ai-draft { margin-top:.75rem; padding:.8rem; border:1px solid var(--border, #d8dee8); border-radius:10px; }
+.ai-draft p { margin:.35rem 0; }
+.ai-actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem; }
+
+.demo-link { margin-top:4px; font-size:12px; color:#a9c8ed; font-weight:700; }
+.offline-demo-hero { display:flex; align-items:center; justify-content:space-between; gap:20px; border-left:5px solid #1e5f9e; }
+.offline-demo-hero h2 { margin:5px 0; font-size:26px; }
+.offline-demo-hero p { margin:0; color:#687386; }
+.demo-controls { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+.demo-controls button { border:0; border-radius:7px; padding:11px 14px; background:#1e5f9e; color:white; font-weight:800; }
+.demo-controls .secondary { background:transparent; color:#31587f; border:1px solid #a8b7c8; }
+.compact-form { grid-template-columns:repeat(2,1fr); }
+.json-preview { max-height:420px; overflow:auto; background:#101b2e; color:#d9e7f7; padding:16px; border-radius:8px; font-size:12px; white-space:pre-wrap; }
+.ai-meta { display:flex; gap:8px; flex-wrap:wrap; margin:.45rem 0; }
+.ai-verification { margin:.5rem 0; padding-left:1.2rem; color:#526173; font-size:13px; }
+@media (max-width: 700px) { .offline-demo-hero { flex-direction:column; align-items:flex-start; } .demo-controls { justify-content:flex-start; } .compact-form { grid-template-columns:1fr; } }
+
+.header-links { display:flex; gap:12px; }
+
+.voice-field { display:flex; gap:8px; align-items:center; }
+.voice-field input { flex:1; }
+.voice-button { white-space:nowrap; }
+@media (max-width:700px){ .voice-field { flex-direction:column; align-items:stretch; } }
+
+.three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.viz-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.viz-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #445166;
+}
+
+.donut-card {
+  align-items: center;
+  text-align: center;
+}
+
+.donut-value {
+  font-size: 24px;
+  font-weight: 800;
+  fill: #172033;
+}
+
+.donut-small {
+  font-size: 11px;
+  fill: #687386;
+}
+
+.viz-copy p,
+.viz-copy small {
+  margin: 4px 0 0;
+  color: #687386;
+}
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 40px;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar-label,
+.bar-value {
+  font-size: 13px;
+  color: #425167;
+}
+
+.bar-track {
+  background: #e8edf3;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #1e5f9e;
+}
+
+.trend-svg {
+  min-height: 140px;
+}
+
+.axis-label {
+  font-size: 10px;
+  fill: #6a7689;
+}
+
+.sync-diagram {
+  display: grid;
+  grid-template-columns: 1fr 160px 1fr;
+  gap: 22px;
+  align-items: center;
+}
+
+.sync-node {
+  border: 1px solid #dbe2ea;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fbfcfe;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sync-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #e8f0f8;
+  font-size: 22px;
+}
+
+.sync-pill {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #edf1f5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sync-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.sync-link-line {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: #1e5f9e;
+}
+
+.sync-link.offline .sync-link-line {
+  background: #b33c3c;
+}
+
+.sync-link span {
+  font-size: 12px;
+  font-weight: 800;
+  color: #687386;
+}
+
+.sync-receipt {
+  font-size: 12px;
+  color: #546274;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ledger-chain {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.ledger-block {
+  min-width: 180px;
+  border: 1px solid #dce3eb;
+  border-radius: 12px;
+  padding: 14px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ledger-block.valid {
+  border-left: 4px solid #29855c;
+}
+
+.ledger-block.invalid {
+  border-left: 4px solid #b33c3c;
+}
+
+.ledger-arrow {
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  color: #6f7a8b;
+}
+
+.ledger-hash {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ledger-hash span {
+  font-size: 11px;
+  color: #6e798b;
+}
+
+.ledger-hash code {
+  font-size: 11px;
+  background: #f5f7fb;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.aircraft-silhouette-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aircraft-silhouette {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 420px;
+
+  border: 1px solid #e2e8ef;
+  border-radius: 12px;
+
+  background:
+    radial-gradient(circle at center, rgba(30, 95, 158, 0.04), transparent 55%),
+    linear-gradient(180deg, #f8fbff, #f4f7fa);
+
+  padding: 18px;
+}
+
+
+/* Main fuselage */
+
+.aircraft-body {
+  fill: #91a6b9;
+  stroke: #536b7c;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+/* Engines */
+
+.aircraft-engine {
+  fill: #6f879c;
+  stroke: #536b7c;
+  stroke-width: 2.5;
+}
+
+
+/* Wings */
+
+.aircraft-wing {
+  fill: #819aae;
+  stroke: #536b7c;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+
+/* Tail surfaces */
+
+.aircraft-tail {
+  fill: #788fa4;
+  stroke: #536b7c;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+
+/* Landing gear indicators */
+
+.aircraft-gear {
+  fill: none;
+  stroke: #536b7c;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+
+/* Hotspots */
+
+.hotspot-group {
+  cursor: pointer;
+}
+
+.aircraft-hotspot {
+  fill: #f7c948;
+  stroke: white;
+  stroke-width: 3;
+
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.hotspot-group:hover .aircraft-hotspot {
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+}
+
+.aircraft-hotspot.medium {
+  fill: #e9a91b;
+}
+
+.aircraft-hotspot.high {
+  fill: #d83b3b;
+}
+
+
+/* Exclamation mark */
+
+.aircraft-hotspot-text {
+  font-size: 13px;
+  font-weight: 900;
+  fill: white;
+  pointer-events: none;
+}
+
+
+/* Legend */
+
+.aircraft-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 24px;
+
+  font-size: 12px;
+  color: #607084;
+
+  flex-wrap: wrap;
+}
+
+.aircraft-legend > div {
+  display: flex;
+  align-items: center;
+}
+
+
+/* Legend dots */
+
+.legend-dot {
+  display: inline-block;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  margin-right: 7px;
+}
+
+.legend-dot.medium {
+  background: #e9a91b;
+}
+
+.legend-dot.high {
+  background: #d83b3b;
+}
+
+.ai-draft textarea {
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  padding: 11px;
+  border: 1px solid #cfd6df;
+  border-radius: 7px;
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.ai-draft label {
+  display: block;
+  margin-top: 14px;
+}
+.follow-on-card {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #d7e2ee;
+  border-left: 4px solid #b47b18;
+  border-radius: 9px;
+  background: #fffaf0;
+}
+
+.follow-on-card h3 {
+  margin: 0 0 4px;
+}
+
+.follow-on-toggle {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.smarthangar-logo {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-row > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.smarthangar-logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}

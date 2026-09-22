@@ -1,0 +1,122 @@
+@startuml SmartHangar_Data_Model
+title SmartHangar 2.0 - Data Model / ERD
+
+hide circle
+skinparam linetype ortho
+skinparam entity {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam defaultFontName Arial
+
+entity "AIRCRAFT" as aircraft {
+  * aircraft_id : INTEGER <<PK>>
+  --
+  tail_number : VARCHAR
+  model : VARCHAR
+  status : VARCHAR
+}
+
+entity "DEVICE_CONFIG" as device_config {
+  * device_id : INTEGER <<PK>>
+  --
+  device_name : VARCHAR
+  assigned_aircraft_id : INTEGER <<FK>>
+  mode : VARCHAR
+}
+
+entity "DISCREPANCY" as discrepancy {
+  * discrepancy_id : INTEGER <<PK>>
+  --
+  aircraft_id : INTEGER <<FK>>
+  description : TEXT
+  category : VARCHAR
+  status : VARCHAR
+  reported_by : VARCHAR
+  created_at : DATETIME
+  synced : BOOLEAN
+}
+
+entity "CORRECTIVE_ACTION" as corrective_action {
+  * corrective_action_id : INTEGER <<PK>>
+  --
+  discrepancy_id : INTEGER <<FK>>
+  action_taken : TEXT
+  performed_by : VARCHAR
+  completed_at : DATETIME
+  synced : BOOLEAN
+}
+
+entity "INSPECTION" as inspection {
+  * inspection_id : INTEGER <<PK>>
+  --
+  aircraft_id : INTEGER <<FK>>
+  inspection_type : VARCHAR
+  due_date : DATETIME
+  status : VARCHAR
+  synced : BOOLEAN
+}
+
+entity "SERVICING" as servicing {
+  * servicing_id : INTEGER <<PK>>
+  --
+  aircraft_id : INTEGER <<FK>>
+  servicing_type : VARCHAR
+  quantity : DECIMAL
+  unit : VARCHAR
+  serviced_by : VARCHAR
+  serviced_at : DATETIME
+  synced : BOOLEAN
+}
+
+entity "TIME_CHANGE_ITEM" as time_change_item {
+  * time_change_id : INTEGER <<PK>>
+  --
+  aircraft_id : INTEGER <<FK>>
+  component_name : VARCHAR
+  due_time : DECIMAL
+  current_time : DECIMAL
+  status : VARCHAR
+}
+
+entity "SHIFT_TURNOVER" as shift_turnover {
+  * turnover_id : INTEGER <<PK>>
+  --
+  aircraft_id : INTEGER <<FK>>
+  notes : TEXT
+  created_by : VARCHAR
+  created_at : DATETIME
+  synced : BOOLEAN
+}
+
+entity "SYNC_QUEUE" as sync_queue {
+  * sync_id : INTEGER <<PK>>
+  --
+  entity_type : VARCHAR
+  entity_id : INTEGER
+  action : VARCHAR
+  created_at : DATETIME
+  sync_status : VARCHAR
+}
+
+aircraft ||--o{ discrepancy : has
+aircraft ||--o{ inspection : has
+aircraft ||--o{ servicing : has
+aircraft ||--o{ time_change_item : has
+aircraft ||--o{ shift_turnover : has
+aircraft ||--o{ device_config : assigned_to
+
+discrepancy ||--o{ corrective_action : resolved_by
+
+note right of sync_queue
+Tracks local records that
+still need to synchronize
+with the central system.
+end note
+
+note bottom of device_config
+Identifies the aircraft-side
+device and its assigned aircraft.
+end note
+
+@enduml

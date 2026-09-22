@@ -103,3 +103,59 @@ CREATE TABLE IF NOT EXISTS modifications (
     notes TEXT,
     FOREIGN KEY (aircraft_id) REFERENCES aircraft(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS device_config (
+    id INTEGER PRIMARY KEY,
+    device_name TEXT NOT NULL,
+    aircraft_id INTEGER,
+    mode TEXT NOT NULL DEFAULT 'AIRCRAFT'
+);
+
+CREATE TABLE IF NOT EXISTS ledger_blocks (
+    block_index INTEGER PRIMARY KEY,
+    block_timestamp TEXT NOT NULL,
+    event_id TEXT UNIQUE NOT NULL,
+    event_type TEXT NOT NULL,
+    target_event_id TEXT,
+    payload_json TEXT NOT NULL,
+    event_timestamp TEXT NOT NULL,
+    previous_hash TEXT NOT NULL,
+    hash TEXT NOT NULL,
+    signer_id TEXT NOT NULL,
+    public_key_base64 TEXT NOT NULL,
+    signature_base64 TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ai_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    discrepancy_id INTEGER,
+    prompt_text TEXT NOT NULL,
+    suggestion_text TEXT NOT NULL,
+    suggested_codes TEXT,
+    decision TEXT NOT NULL DEFAULT 'PENDING',
+    decided_by TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    decided_at TEXT,
+    FOREIGN KEY (discrepancy_id) REFERENCES discrepancies(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS sync_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_event_id TEXT UNIQUE NOT NULL,
+    event_type TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    device_name TEXT,
+    status TEXT NOT NULL DEFAULT 'SYNCED',
+    received_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS offline_sync_receipts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_event_id TEXT UNIQUE NOT NULL,
+    event_type TEXT NOT NULL,
+    local_entity_id TEXT,
+    remote_entity_type TEXT NOT NULL,
+    remote_entity_id INTEGER NOT NULL,
+    result_json TEXT,
+    device_name TEXT,
+    synced_at TEXT DEFAULT CURRENT_TIMESTAMP
+);

@@ -45,3 +45,32 @@ INSERT OR IGNORE INTO servicing_records (id, aircraft_id, type, quantity, unit, 
 INSERT OR IGNORE INTO modifications (id, aircraft_id, mod_number, title, description, status, completed_date, notes) VALUES
 (1, 1, 'MOD-2026-014', 'Updated Communications Package', 'Demonstration communications-system modification.', 'IN PROGRESS', NULL, 'Kit received; awaiting scheduled downtime'),
 (2, 1, 'MOD-2025-008', 'Cabin Lighting Update', 'Demonstration lighting configuration update.', 'COMPLETE', '2025-12-11', 'Completed and inspected');
+
+INSERT OR IGNORE INTO device_config
+(id, device_name, aircraft_id, mode)
+VALUES
+(1, 'SMART-HANGAR-LOCAL-01', 1, 'AIRCRAFT');
+-- Offline aircraft demo dataset. This fictional aircraft represents a locally cached aircraft workspace.
+INSERT OR IGNORE INTO aircraft (id, tail_number, model, status, location, total_hours, total_cycles, assigned_crew_chief) VALUES
+(5, 'DEMO-017', 'C-17A', 'FMC', 'Forward Operating Location (Demo)', 6832.4, 2188, 'SSgt Offline Demo');
+
+INSERT OR IGNORE INTO inspections (id, aircraft_id, name, due_hours, due_date, last_completed_date, status) VALUES
+(10, 5, 'Home Station Check', 6880.0, NULL, '2026-08-21', 'DUE'),
+(11, 5, '30 Day Inspection', NULL, '2026-09-18', '2026-08-19', 'DUE');
+
+INSERT OR IGNORE INTO time_change_items (id, aircraft_id, name, part_number, serial_number, installed_date, installed_hours, due_date, due_hours, warning_hours) VALUES
+(10, 5, 'Hydraulic Filter', 'DEMO-HF-220', 'DEMO-HF-9017', '2026-05-12', 6610.0, NULL, 6890.0, 50.0),
+(11, 5, 'Emergency Bottle', 'DEMO-BOT-18', 'DEMO-EB-017', '2025-10-01', NULL, '2026-10-01', NULL, 30.0);
+
+INSERT OR IGNORE INTO engines (id, aircraft_id, position, serial_number, total_hours, total_cycles, installed_date) VALUES
+(20, 5, 1, 'DEMO-017-E1', 6410.1, 2050, '2024-05-01'),
+(21, 5, 2, 'DEMO-017-E2', 6355.4, 2011, '2024-06-12'),
+(22, 5, 3, 'DEMO-017-E3', 6502.0, 2077, '2024-02-18'),
+(23, 5, 4, 'DEMO-017-E4', 6298.9, 1998, '2024-07-09');
+
+INSERT OR IGNORE INTO servicing_records (id, aircraft_id, type, quantity, unit, serviced_by, service_date, notes) VALUES
+(20, 5, 'FUEL', 54000, 'LBS', 'SSgt Offline Demo', '2026-09-07 18:30:00', 'Cached pre-disconnect fuel state'),
+(21, 5, 'LOX', 68, 'PERCENT', 'SSgt Offline Demo', '2026-09-07 18:35:00', 'Cached pre-disconnect LOX state');
+
+INSERT OR IGNORE INTO device_config (id, device_name, aircraft_id, mode) VALUES
+(2, 'SMART-HANGAR-AIRCRAFT-DEMO-017', 5, 'AIRCRAFT_OFFLINE_CAPABLE');
